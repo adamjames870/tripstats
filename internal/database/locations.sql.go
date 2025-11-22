@@ -7,6 +7,8 @@ package database
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const getLocationFromId = `-- name: GetLocationFromId :one
@@ -24,5 +26,42 @@ func (q *Queries) GetLocationFromId(ctx context.Context, id string) (LocationInf
 		&i.Rating,
 		&i.NumReviews,
 	)
+	return i, err
+}
+
+const resetLocationInfo = `-- name: ResetLocationInfo :exec
+DELETE FROM location_info
+`
+
+func (q *Queries) ResetLocationInfo(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, resetLocationInfo)
+	return err
+}
+
+const resetLocations = `-- name: ResetLocations :exec
+DELETE FROM locations
+`
+
+func (q *Queries) ResetLocations(ctx context.Context) error {
+	_, err := q.db.ExecContext(ctx, resetLocations)
+	return err
+}
+
+const saveLocation = `-- name: SaveLocation :one
+INSERT INTO locations (id, location_id, name)
+VALUES ($1, $2, $3)
+RETURNING id, location_id, name
+`
+
+type SaveLocationParams struct {
+	ID         uuid.UUID
+	LocationID string
+	Name       string
+}
+
+func (q *Queries) SaveLocation(ctx context.Context, arg SaveLocationParams) (Location, error) {
+	row := q.db.QueryRowContext(ctx, saveLocation, arg.ID, arg.LocationID, arg.Name)
+	var i Location
+	err := row.Scan(&i.ID, &i.LocationID, &i.Name)
 	return i, err
 }
