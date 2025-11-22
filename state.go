@@ -10,4 +10,5 @@ type apiState struct {
 	db            *database.Queries
 	mux           *http.ServeMux
 	secret_string string
+	tripApiKey    string
 }

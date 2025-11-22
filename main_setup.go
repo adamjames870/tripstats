@@ -15,6 +15,7 @@ func (state *apiState) LoadState() error {
 	}
 	state.db = database.New(db)
 	state.secret_string = loadSecretString()
+	state.tripApiKey = loadTripApi()
 	return nil
 }
 
@@ -29,4 +30,8 @@ func loadDb() (*sql.DB, error) {
 
 func loadSecretString() string {
 	return os.Getenv("SECRET")
+}
+
+func loadTripApi() string {
+	return os.Getenv("TRIP_API_KEY")
 }
