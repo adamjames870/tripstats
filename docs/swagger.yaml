@@ -1,0 +1,65 @@
+definitions:
+  main.paramsCreateLocation:
+    properties:
+      name:
+        type: string
+      tripadvisor_id:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/healthz:
+    get:
+      description: Returns 200 if service is healthy
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Health check
+      tags:
+      - health
+  /api/locations:
+    post:
+      consumes:
+      - application/json
+      description: Accepts a JSON payload containing a location's external ID and
+        name, stores it, and returns the saved record.
+      parameters:
+      - description: Location details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/main.paramsCreateLocation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.paramsCreateLocation'
+        "400":
+          description: Invalid request or database error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new location
+      tags:
+      - locations
+  /api/reset:
+    post:
+      description: Removes all data in DB, Returns 200 if successful
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Resets DB
+      tags:
+      - reset
+swagger: "2.0"

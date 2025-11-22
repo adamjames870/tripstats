@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	_ "github.com/adamjames870/tripstats/docs"
 	_ "github.com/lib/pq"
 )
 

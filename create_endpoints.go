@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func (state *apiState) CreateEndpoints() {
@@ -9,6 +11,7 @@ func (state *apiState) CreateEndpoints() {
 	// ------------------- Boilerplate -------------------
 
 	state.mux.HandleFunc("GET /api/healthz", handlerHealthz)
+	state.mux.Handle("/swagger/", httpSwagger.WrapHandler)
 
 	// ------------------- Locations -------------------
 

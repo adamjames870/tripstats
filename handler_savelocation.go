@@ -13,6 +13,16 @@ type paramsCreateLocation struct {
 	Name       string `json:"name"`
 }
 
+// handlerSaveLocation godoc
+// @Summary      Create a new location
+// @Description  Accepts a JSON payload containing a location's external ID and name, stores it, and returns the saved record.
+// @Tags         locations
+// @Accept       json
+// @Produce      json
+// @Param        request  body     paramsCreateLocation  true  "Location details"
+// @Success      200      {object} paramsCreateLocation
+// @Failure      400      {object} map[string]string "Invalid request or database error"
+// @Router       /api/locations [post]
 func (s *apiState) handlerSaveLocation(w http.ResponseWriter, r *http.Request) {
 
 	// POST api/locations
@@ -42,6 +52,6 @@ func (s *apiState) handlerSaveLocation(w http.ResponseWriter, r *http.Request) {
 		Name:       loc.Name,
 	}
 
-	respondWithJSON(w, 200, rv)
+	respondWithJSON(w, 201, rv)
 
 }
