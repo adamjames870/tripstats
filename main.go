@@ -2,9 +2,10 @@
 
 import (
 	"fmt"
-	_ "github.com/lib/pq"
 	"net/http"
 	"os"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 	}
 	server := http.Server{
 		Handler: state.mux,
-		Addr:    ":" + port,
+		Addr:    ":8080", // + port,
 	}
 
 	errServe := server.ListenAndServe()
