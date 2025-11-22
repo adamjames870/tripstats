@@ -11,7 +11,7 @@ CREATE TABLE location_info (
     web_url varchar,
     rating float,
     num_reviews int,
-    CONSTRAINT fk_location_id FOREIGN KEY (id) REFERENCES locations(location_id)
+    CONSTRAINT fk_location_id FOREIGN KEY (id) REFERENCES locations(location_id) ON DELETE CASCADE
 );
 
 -- +goose Down
