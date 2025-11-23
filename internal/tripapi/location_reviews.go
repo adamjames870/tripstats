@@ -7,14 +7,14 @@ import (
 	"net/http"
 )
 
-func GetReviews(auth AuthData, params ReviewRequest) (ReviewCollection, error) {
+func GetReviews(auth AuthData, params ReviewRequest, perPage int, offset int) (ReviewCollection, error) {
 	// "https://api.content.tripadvisor.com/api/v1/location"
 
 	nullReturn := ReviewCollection{}
 
 	base := "https://api.content.tripadvisor.com/api/v1/location"
-	endpoint := fmt.Sprintf("%s/%s/reviews?key=%s&language=en",
-		base, params.LocationID, auth.Api_key)
+	endpoint := fmt.Sprintf("%s/%s/reviews?key=%s&language=en&limit=%v&offset=%v",
+		base, params.LocationID, auth.Api_key, perPage, offset)
 
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {

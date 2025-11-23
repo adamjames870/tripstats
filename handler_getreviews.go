@@ -42,24 +42,46 @@ func (s *apiState) handlerGetReviews(w http.ResponseWriter, r *http.Request) {
 		reviewsInDb = 0
 	}
 
-	if reviewsForLocation <= reviewsInDb {
+	resultsToFetch := reviewsForLocation - reviewsInDb
+
+	if resultsToFetch <= 0 {
 		respondWithJSON(w, 200, "all reviews up to date")
 		return
 	}
 
-	// TODO edit to get most recent x reviews
+	numPages := resultsToFetch / 5
+	var savedReviews []database.Review
 
-	reviews, errReviews := getReviewsFromTripAdvisor(auth, params.LocationId)
-	if errReviews != nil {
-		respondWithError(w, 400, "unable to get reviews from tripadvisor: "+errReviews.Error())
+	for i := 0; i < numPages; i++ {
+
+		reviews, errReviews := getReviewsFromTripAdvisor(auth, params.LocationId, 5, (i * 5))
+
+		if errReviews != nil {
+			respondWithError(w, 400, "unable to get reviews from tripadvisor: "+errReviews.Error())
+		}
+
+		for _, review := range reviews.Data {
+			rv, errRv := writeReviewToDb(r.Context(), *s.db, review)
+			if errRv == nil {
+				// ignore erroneous reviews - they will be duplicates
+				savedReviews = append(savedReviews, rv)
+			}
+		}
 	}
 
-	var savedReviews []database.Review
-	for _, review := range reviews.Data {
-		rv, errRv := writeReviewToDb(r.Context(), *s.db, review)
-		if errRv == nil {
-			// ignore erroneous reviews - they will be duplicates
-			savedReviews = append(savedReviews, rv)
+	if numPages%5 != 0 {
+		reviews, errReviews := getReviewsFromTripAdvisor(auth, params.LocationId, numPages%5, numPages*5)
+
+		if errReviews != nil {
+			respondWithError(w, 400, "unable to get reviews from tripadvisor: "+errReviews.Error())
+		}
+
+		for _, review := range reviews.Data {
+			rv, errRv := writeReviewToDb(r.Context(), *s.db, review)
+			if errRv == nil {
+				// ignore erroneous reviews - they will be duplicates
+				savedReviews = append(savedReviews, rv)
+			}
 		}
 	}
 
@@ -87,12 +109,12 @@ func getReviewCountInDatabase(ctx context.Context, db database.Queries, loc_id s
 	return int(reviewCount), nil
 }
 
-func getReviewsFromTripAdvisor(auth tripapi.AuthData, locId string) (tripapi.ReviewCollection, error) {
+func getReviewsFromTripAdvisor(auth tripapi.AuthData, locId string, perPage int, offset int) (tripapi.ReviewCollection, error) {
 	params := tripapi.ReviewRequest{
 		LocationID: locId,
 	}
 
-	return tripapi.GetReviews(auth, params)
+	return tripapi.GetReviews(auth, params, perPage, offset)
 }
 
 func writeReviewToDb(ctx context.Context, db database.Queries, review tripapi.ReviewDetails) (database.Review, error) {
