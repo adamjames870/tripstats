@@ -20,6 +20,10 @@ type ReviewRequest struct {
 	LocationID string
 }
 
+type ReviewCollection struct {
+	Data []ReviewDetails `json:"data"`
+}
+
 type ReviewDetails struct {
 	ReviewID      int64  `json:"id"`
 	LocationID    int64  `json:"location_id"`

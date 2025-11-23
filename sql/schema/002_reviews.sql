@@ -4,7 +4,7 @@ CREATE TABLE reviews (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     tripadvisor_review_id int NOT NULL UNIQUE,
-    location_id varchar NOT NULL UNIQUE,
+    location_id varchar NOT NULL,
     published_date TIMESTAMP NOT NULL,
     tripadvisor_url varchar,
     tripadvisor_title varchar,

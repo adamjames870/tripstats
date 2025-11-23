@@ -7,10 +7,10 @@ import (
 	"net/http"
 )
 
-func GetReviews(auth AuthData, params ReviewRequest) (ReviewDetails, error) {
+func GetReviews(auth AuthData, params ReviewRequest) (ReviewCollection, error) {
 	// "https://api.content.tripadvisor.com/api/v1/location"
 
-	nullReturn := ReviewDetails{}
+	nullReturn := ReviewCollection{}
 
 	base := "https://api.content.tripadvisor.com/api/v1/location"
 	endpoint := fmt.Sprintf("%s/%s/reviews?key=%s&language=en",
@@ -33,7 +33,7 @@ func GetReviews(auth AuthData, params ReviewRequest) (ReviewDetails, error) {
 		return nullReturn, err
 	}
 
-	var details ReviewDetails
+	var details ReviewCollection
 	if err := json.Unmarshal(body, &details); err != nil {
 		return nullReturn, err
 	}
