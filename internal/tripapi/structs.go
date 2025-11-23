@@ -12,5 +12,6 @@ type LocationDetails struct {
 	LocationID string `json:"location_id"`
 	Name       string `json:"name"`
 	WebURL     string `json:"web_url"`
+	Rating     string `json:"rating"`
 	NumReviews string `json:"num_reviews"`
 }

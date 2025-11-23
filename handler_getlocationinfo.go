@@ -1,8 +1,10 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/adamjames870/tripstats/internal/database"
@@ -37,7 +39,7 @@ func (s *apiState) handlerUpdateLocationInfo(w http.ResponseWriter, r *http.Requ
 
 	data, err := GetLocationInfo(auth, params.LocationId)
 	if err != nil {
-		respondWithError(w, 400, "error loading data"+err.Error())
+		respondWithError(w, 400, "error loading data: "+err.Error())
 		return
 	}
 
@@ -45,31 +47,50 @@ func (s *apiState) handlerUpdateLocationInfo(w http.ResponseWriter, r *http.Requ
 	var errSaveLocation error
 
 	// check if record is in database
-	locData, errLocData := s.db.GetLocationFromId(r.Context(), params.LocationId)
+	_, errLocData := s.db.GetLocationFromId(r.Context(), params.LocationId)
 	if errLocData != nil {
 		// not in database
+		rating, _ := strconv.ParseFloat(data.Rating, 64)
+		numReviews, _ := strconv.Atoi(data.NumReviews)
 		dbParams := database.SaveLocationInfoParams{
-			ID:         data.LocationID,
-			CreatedAt:  time.Now(),
-			UpdatedAt:  time.Now(),
-			Name:       data.Name,
-			WebUrl:     locData.WebUrl,
-			Rating:     locData.Rating,
-			NumReviews: locData.NumReviews,
+			ID:        data.LocationID,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      data.Name,
+			WebUrl: sql.NullString{
+				String: data.WebURL,
+				Valid:  true,
+			},
+			Rating: sql.NullFloat64{
+				Float64: rating,
+				Valid:   true,
+			},
+			NumReviews: sql.NullInt32{
+				Int32: int32(numReviews),
+				Valid: true,
+			},
 		}
 		savedLocation, errSaveLocation = s.db.SaveLocationInfo(r.Context(), dbParams)
 	} else {
 		// only update rating and num_reviews
+		rating, _ := strconv.ParseFloat(data.Rating, 64)
+		numReviews, _ := strconv.Atoi(data.NumReviews)
 		dbParams := database.UpdateLocationInfoParams{
-			ID:         locData.ID,
-			Rating:     locData.Rating,
-			NumReviews: locData.NumReviews,
-			UpdatedAt:  time.Now(),
+			ID: data.LocationID,
+			Rating: sql.NullFloat64{
+				Float64: rating,
+				Valid:   true,
+			},
+			NumReviews: sql.NullInt32{
+				Int32: int32(numReviews),
+				Valid: true,
+			},
+			UpdatedAt: time.Now(),
 		}
 		savedLocation, errSaveLocation = s.db.UpdateLocationInfo(r.Context(), dbParams)
 	}
 	if errSaveLocation != nil {
-		respondWithError(w, 400, "unable writing to database"+errSaveLocation.Error())
+		respondWithError(w, 400, "unable to write to database: "+errSaveLocation.Error())
 		return
 	}
 

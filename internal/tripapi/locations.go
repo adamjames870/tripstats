@@ -13,7 +13,8 @@ func GetLocationInfo(auth AuthData, params LocationRequest) (LocationDetails, er
 	nullReturn := LocationDetails{}
 
 	base := "https://api.content.tripadvisor.com/api/v1/location"
-	endpoint := fmt.Sprintf("%s/%s/details?key=%s", base, params.LocationID, auth.Api_key)
+	endpoint := fmt.Sprintf("%s/%s/details?key=%s&language=en&currency=USD",
+		base, params.LocationID, auth.Api_key)
 
 	req, err := http.NewRequest("GET", endpoint, nil)
 	if err != nil {
