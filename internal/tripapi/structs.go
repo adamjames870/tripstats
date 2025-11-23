@@ -15,3 +15,17 @@ type LocationDetails struct {
 	Rating     string `json:"rating"`
 	NumReviews string `json:"num_reviews"`
 }
+
+type ReviewRequest struct {
+	LocationID string
+}
+
+type ReviewDetails struct {
+	ReviewID      int64  `json:"id"`
+	LocationID    int64  `json:"location_id"`
+	PublishedDate string `json:"published_date"`
+	URL           string `json:"url"`
+	Title         string `json:"title"`
+	Text          string `json:"text"`
+	Rating        int64  `json:"rating"`
+}

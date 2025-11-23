@@ -22,7 +22,7 @@ type paramsLocationRequest struct {
 // @Produce      json
 // @Success      200  {object}  tripapi.LocationDetails
 // @Failure      400  "Error loading location information"
-// @Router       /api/location/info [get]
+// @Router       /api/locationinfo [get]
 func (s *apiState) handlerUpdateLocationInfo(w http.ResponseWriter, r *http.Request) {
 
 	auth := tripapi.AuthData{

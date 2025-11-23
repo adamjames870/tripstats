@@ -10,3 +10,4 @@ SET updated_at = $4,
     num_reviews = $3
 WHERE id = $1
 RETURNING *;
+

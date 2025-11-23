@@ -28,3 +28,25 @@ type LocationInfo struct {
 	Rating     sql.NullFloat64
 	NumReviews sql.NullInt32
 }
+
+type Review struct {
+	ID                  uuid.UUID
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	TripadvisorReviewID int32
+	LocationID          string
+	PublishedDate       time.Time
+	TripadvisorUrl      sql.NullString
+	TripadvisorTitle    sql.NullString
+	TripadvisorText     sql.NullString
+	Rating              int32
+}
+
+type SubReview struct {
+	ID            uuid.UUID
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	ReviewID      uuid.UUID
+	SubratingName string
+	Rating        int32
+}

@@ -16,8 +16,12 @@ func (state *apiState) CreateEndpoints() {
 	// ------------------- Locations -------------------
 
 	state.mux.HandleFunc("POST /api/reset", state.handlerResetDb)
-	state.mux.HandleFunc("POST /api/locations", state.handlerSaveLocation)
-	state.mux.HandleFunc("GET /api/locations/{LocationId}", state.handlerUpdateLocationInfo)
+	state.mux.HandleFunc("POST /api/location", state.handlerSaveLocation)
+	state.mux.HandleFunc("GET /api/locationinfo", state.handlerUpdateLocationInfo)
+
+	// ------------------- Reviews -------------------
+
+	state.mux.HandleFunc("GET /api/reviewinfo", state.handlerGetReviews)
 
 	fmt.Println("Added Handlers")
 }
