@@ -6,6 +6,17 @@ definitions:
       tripadvisor_id:
         type: string
     type: object
+  tripapi.LocationDetails:
+    properties:
+      location_id:
+        type: string
+      name:
+        type: string
+      num_reviews:
+        type: string
+      web_url:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -21,6 +32,22 @@ paths:
       summary: Health check
       tags:
       - health
+  /api/location/info:
+    get:
+      description: Fetches location details from the TripAdvisor API using the configured
+        API key.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/tripapi.LocationDetails'
+        "400":
+          description: Error loading location information
+      summary: Retrieve location information
+      tags:
+      - locations
   /api/locations:
     post:
       consumes:

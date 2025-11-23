@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/adamjames870/tripstats/internal/database"
 	"github.com/google/uuid"
@@ -37,6 +38,8 @@ func (s *apiState) handlerSaveLocation(w http.ResponseWriter, r *http.Request) {
 
 	dbParams := database.SaveLocationParams{
 		ID:         uuid.New(),
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 		LocationID: params.LocationId,
 		Name:       params.Name,
 	}

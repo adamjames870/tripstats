@@ -7,12 +7,13 @@ package database
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 const getLocationFromId = `-- name: GetLocationFromId :one
-SELECT id, name, web_url, rating, num_reviews FROM location_info
+SELECT id, created_at, updated_at, name, web_url, rating, num_reviews FROM location_info
 WHERE id = $1
 `
 
@@ -21,6 +22,8 @@ func (q *Queries) GetLocationFromId(ctx context.Context, id string) (LocationInf
 	var i LocationInfo
 	err := row.Scan(
 		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 		&i.Name,
 		&i.WebUrl,
 		&i.Rating,
@@ -48,20 +51,34 @@ func (q *Queries) ResetLocations(ctx context.Context) error {
 }
 
 const saveLocation = `-- name: SaveLocation :one
-INSERT INTO locations (id, location_id, name)
-VALUES ($1, $2, $3)
-RETURNING id, location_id, name
+INSERT INTO locations (id, created_at, updated_at, location_id, name)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, created_at, updated_at, location_id, name
 `
 
 type SaveLocationParams struct {
 	ID         uuid.UUID
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 	LocationID string
 	Name       string
 }
 
 func (q *Queries) SaveLocation(ctx context.Context, arg SaveLocationParams) (Location, error) {
-	row := q.db.QueryRowContext(ctx, saveLocation, arg.ID, arg.LocationID, arg.Name)
+	row := q.db.QueryRowContext(ctx, saveLocation,
+		arg.ID,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+		arg.LocationID,
+		arg.Name,
+	)
 	var i Location
-	err := row.Scan(&i.ID, &i.LocationID, &i.Name)
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.LocationID,
+		&i.Name,
+	)
 	return i, err
 }

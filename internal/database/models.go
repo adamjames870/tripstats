@@ -6,18 +6,23 @@ package database
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type Location struct {
 	ID         uuid.UUID
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 	LocationID string
 	Name       string
 }
 
 type LocationInfo struct {
 	ID         string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 	Name       string
 	WebUrl     sql.NullString
 	Rating     sql.NullFloat64

@@ -33,6 +33,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/location/info": {
+            "get": {
+                "description": "Fetches location details from the TripAdvisor API using the configured API key.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "locations"
+                ],
+                "summary": "Retrieve location information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/tripapi.LocationDetails"
+                        }
+                    },
+                    "400": {
+                        "description": "Error loading location information"
+                    }
+                }
+            }
+        },
         "/api/locations": {
             "post": {
                 "description": "Accepts a JSON payload containing a location's external ID and name, stores it, and returns the saved record.",
@@ -103,6 +126,23 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "tripadvisor_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "tripapi.LocationDetails": {
+            "type": "object",
+            "properties": {
+                "location_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "num_reviews": {
+                    "type": "string"
+                },
+                "web_url": {
                     "type": "string"
                 }
             }

@@ -1,6 +1,6 @@
 -- name: SaveLocation :one
-INSERT INTO locations (id, location_id, name)
-VALUES ($1, $2, $3)
+INSERT INTO locations (id, created_at, updated_at, location_id, name)
+VALUES ($1, $2, $3, $4, $5)
 RETURNING *;
 
 -- name: GetLocationFromId :one
@@ -12,3 +12,4 @@ DELETE FROM locations;
 
 -- name: ResetLocationInfo :exec
 DELETE FROM location_info;
+
