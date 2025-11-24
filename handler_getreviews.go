@@ -17,6 +17,13 @@ type paramsReviewRequest struct {
 	LocationId string `json:"location_id"`
 }
 
+type paramsReviewReturn struct {
+	resultsToFetch int
+	pagesToFetch   int
+	reviews        []database.Review
+	errors         []error
+}
+
 func (s *apiState) handlerGetReviews(w http.ResponseWriter, r *http.Request) {
 
 	auth := tripapi.AuthData{
@@ -50,7 +57,9 @@ func (s *apiState) handlerGetReviews(w http.ResponseWriter, r *http.Request) {
 	}
 
 	numPages := resultsToFetch / 5
-	var savedReviews []database.Review
+	var rv paramsReviewReturn
+	rv.resultsToFetch = resultsToFetch
+	rv.pagesToFetch = numPages
 
 	for i := 0; i < numPages; i++ {
 
@@ -61,10 +70,11 @@ func (s *apiState) handlerGetReviews(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, review := range reviews.Data {
-			rv, errRv := writeReviewToDb(r.Context(), *s.db, review)
+			dbReview, errRv := writeReviewToDb(r.Context(), *s.db, review)
 			if errRv == nil {
-				// ignore erroneous reviews - they will be duplicates
-				savedReviews = append(savedReviews, rv)
+				rv.reviews = append(rv.reviews, dbReview)
+			} else {
+				rv.errors = append(rv.errors, errRv)
 			}
 		}
 	}
@@ -77,15 +87,15 @@ func (s *apiState) handlerGetReviews(w http.ResponseWriter, r *http.Request) {
 		}
 
 		for _, review := range reviews.Data {
-			rv, errRv := writeReviewToDb(r.Context(), *s.db, review)
+			dbReview, errRv := writeReviewToDb(r.Context(), *s.db, review)
 			if errRv == nil {
 				// ignore erroneous reviews - they will be duplicates
-				savedReviews = append(savedReviews, rv)
+				rv.reviews = append(rv.reviews, dbReview)
 			}
 		}
 	}
 
-	respondWithJSON(w, 200, savedReviews)
+	respondWithJSON(w, 200, rv)
 
 }
 
