@@ -18,10 +18,10 @@ type paramsReviewRequest struct {
 }
 
 type paramsReviewReturn struct {
-	resultsToFetch int
-	pagesToFetch   int
-	reviews        []database.Review
-	errors         []error
+	ResultsToFetch int               `json:"results_to_fetch"`
+	PagesToFetch   int               `json:"pages_to_fetch"`
+	Reviews        []database.Review `json:"reviews"`
+	Errors         []error           `json:"errors"`
 }
 
 func (s *apiState) handlerGetReviews(w http.ResponseWriter, r *http.Request) {
@@ -58,23 +58,23 @@ func (s *apiState) handlerGetReviews(w http.ResponseWriter, r *http.Request) {
 
 	numPages := resultsToFetch / 5
 	var rv paramsReviewReturn
-	rv.resultsToFetch = resultsToFetch
-	rv.pagesToFetch = numPages
+	rv.ResultsToFetch = resultsToFetch
+	rv.PagesToFetch = numPages
 
 	for i := 0; i < numPages; i++ {
 
 		reviews, errReviews := getReviewsFromTripAdvisor(auth, params.LocationId, 5, (i * 5))
 
 		if errReviews != nil {
-			respondWithError(w, 400, "unable to get reviews from tripadvisor: "+errReviews.Error())
+			rv.Errors = append(rv.Errors, errReviews)
 		}
 
 		for _, review := range reviews.Data {
 			dbReview, errRv := writeReviewToDb(r.Context(), *s.db, review)
 			if errRv == nil {
-				rv.reviews = append(rv.reviews, dbReview)
+				rv.Reviews = append(rv.Reviews, dbReview)
 			} else {
-				rv.errors = append(rv.errors, errRv)
+				rv.Errors = append(rv.Errors, errRv)
 			}
 		}
 	}
@@ -83,14 +83,16 @@ func (s *apiState) handlerGetReviews(w http.ResponseWriter, r *http.Request) {
 		reviews, errReviews := getReviewsFromTripAdvisor(auth, params.LocationId, numPages%5, numPages*5)
 
 		if errReviews != nil {
-			respondWithError(w, 400, "unable to get reviews from tripadvisor: "+errReviews.Error())
+			rv.Errors = append(rv.Errors, errReviews)
 		}
 
 		for _, review := range reviews.Data {
 			dbReview, errRv := writeReviewToDb(r.Context(), *s.db, review)
 			if errRv == nil {
 				// ignore erroneous reviews - they will be duplicates
-				rv.reviews = append(rv.reviews, dbReview)
+				rv.Reviews = append(rv.Reviews, dbReview)
+			} else {
+				rv.Errors = append(rv.Errors, errRv)
 			}
 		}
 	}
